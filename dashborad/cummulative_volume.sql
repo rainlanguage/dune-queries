@@ -65,10 +65,15 @@ polygon_raw_data AS (
     token_symbol
 ),
 
+
 -- Repeat similar steps for BNB
 bnb_unique_events AS (
   SELECT DISTINCT evt_tx_hash, evt_block_number
-  FROM raindex_bnb.OrderBook_evt_TakeOrder
+  FROM (
+    SELECT evt_tx_hash, evt_block_number FROM raindex_bnb.OrderBook_evt_TakeOrder
+    UNION ALL
+    SELECT evt_tx_hash, evt_block_number FROM raindex_bnb.OrderBook_evt_TakeOrderV2
+  ) AS events
 ),
 bnb_trade_flows AS (
   SELECT
@@ -136,8 +141,13 @@ base_raw_data AS (
 -- Repeat similar steps for Arbitrum
 arbitrum_unique_events AS (
   SELECT DISTINCT evt_tx_hash, evt_block_number
-  FROM raindex_arbitrum.OrderBook_evt_TakeOrder
+  FROM (
+    SELECT evt_tx_hash, evt_block_number FROM raindex_arbitrum.OrderBook_evt_TakeOrder
+    UNION ALL
+    SELECT evt_tx_hash, evt_block_number FROM raindex_arbitrum.OrderBook_evt_TakeOrderV2
+  ) AS events
 ),
+
 arbitrum_trade_flows AS (
   SELECT
     t.block_date,
